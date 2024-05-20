@@ -1,19 +1,11 @@
-const http = require('http');
+const express = require('express')
+const app = express()
+const port = 3000
 
-const hostname = '127.0.0.1';
-const port = 3000;
+app.get('/', (req, res) => {
+  res.send('My name is Zaid')
+})
 
-const server = http.createServer((req, res) => {
-    if (req.method === 'GET' && req.url === '/') {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ foo: "bar" }));
-    } else {
-        res.statusCode = 404;
-        res.end('Not Found');
-    }
-});
-
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
-});
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
