@@ -45,6 +45,7 @@ const movieSchema = new mongoose.Schema(
 // Create a model from the schema
 const MovieModel = mongoose.model("Movies", movieSchema, "movies");
 
+//
 app.post("/createMovie", async (req, res) => {
   try {
     const { title, release_date, description, image_url } = req.body;
@@ -57,7 +58,7 @@ app.post("/createMovie", async (req, res) => {
     await newMovie.save();
     res.status(201).json({ status: "true" });
   } catch (error) {
-    res.status(400).json({status: "false", error: error.message});
+    res.status(400).json({ status: "false", error: error.message });
   }
 });
 
@@ -73,7 +74,7 @@ app.get("/getMovie/:id", async (req, res) => {
 
     // Check if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(movieId)) {
-      return res.status(400).json({error: "Invalid movie ID"});
+      return res.status(400).json({ error: "Invalid movie ID" });
     }
 
     const movieData = await MovieModel.findById(
@@ -81,10 +82,41 @@ app.get("/getMovie/:id", async (req, res) => {
     );
 
     if (!movieData) {
-      return res.status(404).json({error: "Movie not found"});
+      return res.status(404).json({ error: "Movie not found" });
     }
     res.status(200).json(movieData);
   } catch (error) {
-    res.status(400).json({error: error});
+    res.status(400).json({ error: error });
   }
 });
+
+//Delete a movie
+app.post("/delete", function (req, res) {
+  MovieModel.findByIdAndDelete(req.body.id, function (err, data) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(data);
+      console.log("Data Deleted!");
+    }
+  });
+});
+
+app.put("/update/:id", async (req, res) => {
+  try {
+    const movieId = req.params.id;
+
+    const Movie = await MovieModel.findByIdAndUpdate(movieId, req.body);
+
+    if (!Movie) {
+      return res.status(404).json({ error: "Movie not found" });
+    }
+
+    const updatedMovie = await MovieModel.findById(movieId);
+    res.status(200).json(updatedMovie);
+
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
