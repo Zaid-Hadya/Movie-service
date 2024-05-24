@@ -91,16 +91,25 @@ app.get("/getMovie/:id", async (req, res) => {
 });
 
 //Delete a movie
-app.post("/delete", function (req, res) {
-  MovieModel.findByIdAndDelete(req.body.id, function (err, data) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send(data);
-      console.log("Data Deleted!");
+app.delete("/delete/:id", async (req, res) => {
+  
+    try {
+      const movieId = req.params.id;
+    
+      const Movie = await MovieModel.findByIdAndDelete(movieId, req.body);
+    
+      if (!Movie) {
+        return res.status(404).json({ error: "Movie not found" });
+      }
+    
+      const deletedMovie = await MovieModel.findById(movieId);
+      res.status(200).json(deletedMovie);
+    
+    } catch (error) {
+      res.status(500).json({ error: "Internal Server Error" });
     }
-  });
 });
+
 
 app.put("/update/:id", async (req, res) => {
   try {
